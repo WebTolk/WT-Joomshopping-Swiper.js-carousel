@@ -3,19 +3,19 @@
 	<fieldset name="breakpoint">
 		<field name="breakpoint"
 			   type="text"
-			   filter="integer"
+			   filter="float"
 			   label="breakpoint"/>
 	</fieldset>
 	<fieldset name="breakpoint_params">
 		<field type="text"
 			   name="slidesPerView"
 			   label="slidesPerView"
-			   filter="integer"
+			   filter="float"
 			   default="2"/>
 		<field type="text"
 			   name="spaceBetween"
 			   label="spaceBetween"
-			   filter="integer"
+			   filter="float"
 			   default="20"/>
 		<field type="list"
 			   name="direction"
