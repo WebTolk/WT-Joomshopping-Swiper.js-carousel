@@ -2,20 +2,20 @@
 /**
  * @package     WT JShopping Swiper carousel
  * @copyright   Copyright (C) 2022-2023 Sergey Tolkachyov. All rights reserved.
- * @author      Sergey Tolkachyov - https://web-tolk.ru
- * @link 		https://web-tolk.ru
- * @version 	1.1.1
+ * @author      Sergey Tolkachyov
+ * @link        https://web-tolk.ru
+ * @version     1.1.2
  * @license     GNU General Public License version 3 or later
  */
 
 namespace Joomla\Module\Wtjshoppingswipercarousel\Site\Dispatcher;
 
-\defined('JPATH_PLATFORM') or die;
-
 use Joomla\CMS\Dispatcher\AbstractModuleDispatcher;
 use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\Module\Wtjshoppingswipercarousel\Site\Helper\WtjshoppingswipercarouselHelper;
+use function defined;
 
+defined('JPATH_PLATFORM') or die;
 /**
  * Dispatcher class for mod_wtyandexmapitems
  *
@@ -39,11 +39,14 @@ class Dispatcher extends AbstractModuleDispatcher
 			return false;
 		}
 
-		$data = parent::getLayoutData();
+		$data            = parent::getLayoutData();
 		$moduleclass_sfx = ($data['params'])->get('moduleclass_sfx');
-		if(!empty($moduleclass_sfx)){
-			$data['moduleclass_sfx'] =	htmlspecialchars($moduleclass_sfx, ENT_COMPAT, 'UTF-8');
-		} else {
+		if (!empty($moduleclass_sfx))
+		{
+			$data['moduleclass_sfx'] = htmlspecialchars($moduleclass_sfx, ENT_COMPAT, 'UTF-8');
+		}
+		else
+		{
 			$data['moduleclass_sfx'] = '';
 		}
 
@@ -51,7 +54,7 @@ class Dispatcher extends AbstractModuleDispatcher
 
 		$module_helper->getSwiperParams($data, $this->getApplication());
 
-		$data['list'] = $module_helper->getList($data['params'], $this->getApplication());
+		$data['list']        = $module_helper->getList($data['params'], $this->getApplication());
 		$data['jshopConfig'] = $module_helper->getJshopConfig();
 
 

@@ -2,19 +2,20 @@
 /**
  * @package     WT JShopping Swiper carousel
  * @copyright   Copyright (C) 2022-2023 Sergey Tolkachyov. All rights reserved.
- * @author      Sergey Tolkachyov - https://web-tolk.ru
+ * @author      Sergey Tolkachyov
  * @link        https://web-tolk.ru
- * @version     1.1.1
+ * @version     1.1.2
  * @license     GNU General Public License version 3 or later
  */
 
 namespace Joomla\Module\Wtjshoppingswipercarousel\Site\Fields;
 
-defined('_JEXEC') or die;
-
 use Joomla\CMS\Form\FormHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Form\Field\ListField;
+use JSFactory;
+
+defined('_JEXEC') or die;
 
 FormHelper::loadFieldClass('list');
 
@@ -36,7 +37,7 @@ class JshoppinglabelsField extends ListField
 			return '-- JoomShopping component is not installled --';
 		}
 
-		$labels    = \JSFactory::getModel("Productlabels");
+		$labels    = JSFactory::getModel("Productlabels");
 		$alllabels = $labels->getList();
 
 		$options = [];
@@ -48,5 +49,3 @@ class JshoppinglabelsField extends ListField
 		return $options;
 	}
 }
-
-?>
