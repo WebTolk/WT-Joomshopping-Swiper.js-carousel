@@ -264,6 +264,16 @@
 					<option value="0">JNO</option>
 				</field>
 				<field type="radio"
+					   name="loop"
+					   class="btn-group btn-group-yesno"
+					   description="MOD_WTJSHOPPINGSWIPERCAROUSEL_FIELDS_LOOP_DESC"
+					   label="MOD_WTJSHOPPINGSWIPERCAROUSEL_FIELDS_LOOP"
+					   default="1"
+					   filter="integer">
+					<option value="1">MOD_WTJSHOPPINGSWIPERCAROUSEL_FIELDS_LOOP_VAL_LOOP</option>
+					<option value="0">MOD_WTJSHOPPINGSWIPERCAROUSEL_FIELDS_LOOP_VAL_REG</option>
+				</field>
+				<field type="radio"
 					   name="autoHeight"
 					   class="btn-group btn-group-yesno"
 					   description="Set to true and slider wrapper will adapt its height to the height of the currently active slide"
