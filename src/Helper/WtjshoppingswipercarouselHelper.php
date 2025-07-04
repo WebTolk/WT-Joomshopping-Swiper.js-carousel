@@ -1,10 +1,10 @@
 <?php
 /**
- * @package     WT JShopping Swiper carousel
+ * @package    WT JShopping Swiper carousel
  * @copyright   Copyright (C) 2022-2023 Sergey Tolkachyov. All rights reserved.
- * @author      Sergey Tolkachyov
- * @link        https://web-tolk.ru
- * @version     1.1.2
+ * @author     Sergey Tolkachyov
+ * @link       https://web-tolk.ru
+ * @version     1.1.3
  * @license     GNU General Public License version 3 or later
  */
 
@@ -17,7 +17,14 @@ use Joomla\Component\Jshopping\Site\Model\Productlist;
 use Joomla\Component\Jshopping\Site\Table\ConfigTable;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Folder;
-use stdClass;
+use \stdClass;
+use function defined;
+use function strpos;
+use function explode;
+use function array_map;
+use function trim;
+use function is_array;
+use function count;
 
 defined('_JEXEC') or die;
 
@@ -159,7 +166,7 @@ class WtjshoppingswipercarouselHelper
 		}
 
 		if ($params->get('joomshopping_products_type') == 'toprating_products') {
-			$product = \JSFactory::getModel('toprating', 'Site\\Productlist');
+			$product = JSFactory::getModel('toprating', 'Site\\Productlist');
 			$categories = $params->get('catids', []);
 			if (is_array($categories) && count($categories) > 0) {
 				$categories = array_map('intval', $categories);
@@ -175,7 +182,7 @@ class WtjshoppingswipercarouselHelper
 
 		}
 		if ($params->get('joomshopping_products_type') == 'tophits_products') {
-			$product = \JSFactory::getModel('tophits', 'Site\\Productlist');
+			$product = JSFactory::getModel('tophits', 'Site\\Productlist');
 			$categories = $params->get('catids', []);
 			if (is_array($categories) && count($categories) > 0) {
 				$categories = array_map('intval', $categories);
@@ -245,9 +252,7 @@ class WtjshoppingswipercarouselHelper
 	 */
 	public function getJshopConfig(): object
 	{
-		if (!class_exists('JSFactory') && file_exists(JPATH_SITE . '/components/com_jshopping/bootstrap.php')) {
-			require_once(JPATH_SITE . '/components/com_jshopping/bootstrap.php');
-		}
+		require_once(JPATH_SITE . '/components/com_jshopping/bootstrap.php');
 
 		$jshopConfig = JSFactory::getConfig();
 
