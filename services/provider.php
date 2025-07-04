@@ -4,7 +4,7 @@
  * @copyright   Copyright (C) 2022-2023 Sergey Tolkachyov. All rights reserved.
  * @author     Sergey Tolkachyov
  * @link       https://web-tolk.ru
- * @version 	1.1.2
+ * @version 	1.1.3
  * @license     GNU General Public License version 3 or later
  */
 defined('_JEXEC') or die;

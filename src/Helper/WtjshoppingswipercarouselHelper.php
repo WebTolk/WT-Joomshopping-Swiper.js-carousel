@@ -1,10 +1,10 @@
 <?php
 /**
- * @package     WT JShopping Swiper carousel
+ * @package    WT JShopping Swiper carousel
  * @copyright   Copyright (C) 2022-2023 Sergey Tolkachyov. All rights reserved.
- * @author      Sergey Tolkachyov
- * @link        https://web-tolk.ru
- * @version     1.1.2
+ * @author     Sergey Tolkachyov
+ * @link       https://web-tolk.ru
+ * @version     1.1.3
  * @license     GNU General Public License version 3 or later
  */
 
@@ -17,7 +17,14 @@ use Joomla\Component\Jshopping\Site\Model\Productlist;
 use Joomla\Component\Jshopping\Site\Table\ConfigTable;
 use Joomla\Filesystem\File;
 use Joomla\Filesystem\Folder;
-use stdClass;
+use \stdClass;
+use function defined;
+use function strpos;
+use function explode;
+use function array_map;
+use function trim;
+use function is_array;
+use function count;
 
 defined('_JEXEC') or die;
 
@@ -33,16 +40,11 @@ class WtjshoppingswipercarouselHelper
 	{
 		$list = [];
 
-		if ($params->get('carousel_type') == 'folder')
-		{
+		if ($params->get('carousel_type') == 'folder') {
 			$list = $this->getImagesFromFolder($params);
-		}
-		elseif ($params->get('carousel_type') == 'images')
-		{
+		} elseif ($params->get('carousel_type') == 'images') {
 			$list = $this->getImagesFromModuleParams($params);
-		}
-		elseif ($params->get('carousel_type') == 'joomshopping_products')
-		{
+		} elseif ($params->get('carousel_type') == 'joomshopping_products') {
 			$list = $this->getJshoppingProducts($params, $app);
 		}
 
@@ -58,17 +60,15 @@ class WtjshoppingswipercarouselHelper
 	 */
 	private function getImagesFromFolder($params): array
 	{
-		$images            = [];
+		$images = [];
 		$files_from_folder = Folder::files(JPATH_ROOT . '/images/' . $params->get('folder'));
 		$images_extensions = ['bmp', 'gif', 'jpg', 'png', 'jpeg', 'webp', 'avif'];
-		foreach ($files_from_folder as $file)
-		{
-			if (in_array(File::getExt($file), $images_extensions))
-			{
-				$image       = new stdClass();
+		foreach ($files_from_folder as $file) {
+			if (in_array(File::getExt($file), $images_extensions)) {
+				$image = new stdClass();
 				$image->path = 'images/' . $params->get('folder') . '/' . $file;
-				$image->alt  = $params->get('folder_images_alt');
-				$images[]    = $image;
+				$image->alt = $params->get('folder_images_alt');
+				$images[] = $image;
 			}
 		}
 
@@ -86,13 +86,12 @@ class WtjshoppingswipercarouselHelper
 	private function getImagesFromModuleParams($params): array
 	{
 		$list = [];
-		foreach ($params->get("fields") as $field)
-		{
-			$image            = new stdClass();
+		foreach ($params->get("fields") as $field) {
+			$image = new stdClass();
 			$clean_image_path = HTMLHelper::cleanImageURL($field->image);
-			$image->path      = $clean_image_path->url;
-			$image->alt       = $field->image_alt;
-			$list[]           = $image;
+			$image->path = $clean_image_path->url;
+			$image->alt = $field->image_alt;
+			$list[] = $image;
 		}
 
 		return $list;
@@ -112,51 +111,43 @@ class WtjshoppingswipercarouselHelper
 	{
 		PluginHelper::importPlugin('jshoppingproducts');
 		$jshopConfig = $this->getJshopConfig();
-		$noimage     = $jshopConfig->image_product_live_path . "/noimage.gif";
-		$filters     = [];
-		$count       = $params->get('joomshopping_products_count_products', 4);
-		$list        = [];
-		if ($params->get('joomshopping_products_type') == 'last_products')
-		{
+		$noimage = $jshopConfig->image_product_live_path . "/noimage.gif";
+		$filters = [];
+		$count = $params->get('joomshopping_products_count_products', 4);
+		$list = [];
+		if ($params->get('joomshopping_products_type') == 'last_products') {
 			$productlist = JSFactory::getModel('last', 'Site\\Productlist');
-			$categories  = $params->get('catids', []);
-			if (is_array($categories) && count($categories) > 0)
-			{
+			$categories = $params->get('catids', []);
+			if (is_array($categories) && count($categories) > 0) {
 				$categories = array_map('intval', $categories);
 			}
 			$filters['categorys'] = $categories;
 
 			$order = 'prod.product_id';
-//		$order = 'prod.'.$params->get('order_by', 'product_id');
+			//		$order = 'prod.'.$params->get('order_by', 'product_id');
 			$rows = $productlist->getLoadProducts($filters, $order, 'DESC', 0, $count);
 
 			$app->triggerEvent('onBeforeDisplayProductList', [&$rows]);
-			$view       = new stdClass();
+			$view = new stdClass();
 			$view->rows = $rows;
 			$app->triggerEvent('onBeforeDisplayProductListView', [&$view, &$productlist]);
 			$list = $view->rows;
 
 		}
 
-		if ($params->get('joomshopping_products_type') == 'products_by_ids')
-		{
+		if ($params->get('joomshopping_products_type') == 'products_by_ids') {
 			$product_ids = $params->get('joomshopping_products_ids');
 
-			if (!empty($product_ids))
-			{
-				if (strpos($product_ids, ',') !== false)
-				{
+			if (!empty($product_ids)) {
+				if (strpos($product_ids, ',') !== false) {
 					$product_ids = explode(',', $product_ids);
 					$product_ids = array_map('trim', $product_ids);
 
-				}
-				else
-				{
+				} else {
 					$product_ids = (array) trim($product_ids);
 				}
 
-				if (is_array($product_ids) && count($product_ids) > 0)
-				{
+				if (is_array($product_ids) && count($product_ids) > 0) {
 
 					$product_list = new Productlist\ListModel();
 
@@ -174,30 +165,26 @@ class WtjshoppingswipercarouselHelper
 			}
 		}
 
-		if ($params->get('joomshopping_products_type') == 'toprating_products')
-		{
-			$product    = \JSFactory::getModel('toprating', 'Site\\Productlist');
+		if ($params->get('joomshopping_products_type') == 'toprating_products') {
+			$product = JSFactory::getModel('toprating', 'Site\\Productlist');
 			$categories = $params->get('catids', []);
-			if (is_array($categories) && count($categories) > 0)
-			{
+			if (is_array($categories) && count($categories) > 0) {
 				$categories = array_map('intval', $categories);
 			}
 			$filters['categorys'] = $categories;
-			$rows                 = $product->getLoadProducts($filters, null, 'DESC', 0, $count);
+			$rows = $product->getLoadProducts($filters, null, 'DESC', 0, $count);
 
 			$app->triggerEvent('onBeforeDisplayProductList', [&$rows]);
-			$view       = new stdClass();
+			$view = new stdClass();
 			$view->rows = $rows;
 			$app->triggerEvent('onBeforeDisplayProductListView', [&$view, &$product]);
 			$list = $view->rows;
 
 		}
-		if ($params->get('joomshopping_products_type') == 'tophits_products')
-		{
-			$product    = \JSFactory::getModel('tophits', 'Site\\Productlist');
+		if ($params->get('joomshopping_products_type') == 'tophits_products') {
+			$product = JSFactory::getModel('tophits', 'Site\\Productlist');
 			$categories = $params->get('catids', []);
-			if (is_array($categories) && count($categories) > 0)
-			{
+			if (is_array($categories) && count($categories) > 0) {
 				$categories = array_map('intval', $categories);
 			}
 			$filters['categorys'] = $categories;
@@ -205,44 +192,39 @@ class WtjshoppingswipercarouselHelper
 			$rows = $product->getLoadProducts($filters, null, 'DESC', 0, $count);
 
 			$app->triggerEvent('onBeforeDisplayProductList', [&$rows]);
-			$view       = new stdClass();
+			$view = new stdClass();
 			$view->rows = $rows;
 			$app->triggerEvent('onBeforeDisplayProductListView', [&$view, &$product]);
 			$list = $view->rows;
 
 		}
-		if ($params->get('joomshopping_products_type') == 'bestseller_products')
-		{
+		if ($params->get('joomshopping_products_type') == 'bestseller_products') {
 			$categories = $params->get('catids', []);
-			if (is_array($categories) && count($categories) > 0)
-			{
+			if (is_array($categories) && count($categories) > 0) {
 				$categories = array_map('intval', $categories);
 			}
 
 			$filters['categorys'] = $categories;
-			$productlist          = JSFactory::getModel('bestseller', 'Site\\Productlist');
-			$rows                 = $productlist->getLoadProducts($filters, null, 'DESC', 0, $count);
+			$productlist = JSFactory::getModel('bestseller', 'Site\\Productlist');
+			$rows = $productlist->getLoadProducts($filters, null, 'DESC', 0, $count);
 			$app->triggerEvent('onBeforeDisplayProductList', [&$rows]);
-			$view       = new stdClass();
+			$view = new stdClass();
 			$view->rows = $rows;
 			$app->triggerEvent('onBeforeDisplayProductListView', [&$view]);
 			$list = $view->rows;
 
 		}
-		if ($params->get('joomshopping_products_type') == 'label_products')
-		{
+		if ($params->get('joomshopping_products_type') == 'label_products') {
 
-			$product   = JSFactory::getModel('label', 'Site\\Productlist');
+			$product = JSFactory::getModel('label', 'Site\\Productlist');
 			$label_ids = (array) $params->get('label_id');
 
-			if ($label_ids)
-			{
+			if ($label_ids) {
 				$filters['labels'] = $label_ids;
 			}
 
 			$categories = $params->get('catids', []);
-			if (is_array($categories) && count($categories) > 0)
-			{
+			if (is_array($categories) && count($categories) > 0) {
 				$categories = array_map('intval', $categories);
 			}
 
@@ -251,7 +233,7 @@ class WtjshoppingswipercarouselHelper
 			$rows = $product->getLoadProducts($filters, null, 'DESC', 0, $count);
 
 			$app->triggerEvent('onBeforeDisplayProductList', [&$rows]);
-			$view       = new stdClass();
+			$view = new stdClass();
 			$view->rows = $rows;
 			$app->triggerEvent('onBeforeDisplayProductListView', [&$view, &$product]);
 			$list = $view->rows;
@@ -270,10 +252,7 @@ class WtjshoppingswipercarouselHelper
 	 */
 	public function getJshopConfig(): object
 	{
-		if (!class_exists('JSFactory') && file_exists(JPATH_SITE . '/components/com_jshopping/bootstrap.php'))
-		{
-			require_once(JPATH_SITE . '/components/com_jshopping/bootstrap.php');
-		}
+		require_once(JPATH_SITE . '/components/com_jshopping/bootstrap.php');
 
 		$jshopConfig = JSFactory::getConfig();
 
@@ -291,31 +270,29 @@ class WtjshoppingswipercarouselHelper
 	 */
 	public function getSwiperParams($data, $app): void
 	{
-		$params        = $data['params'];
-		$module_id     = ($data['module'])->id;
+		$params = $data['params'];
+		$module_id = ($data['module'])->id;
 		$swiper_params = [
-			'speed'          => $params->get('speed', 400),
-			'spaceBetween'   => $params->get('spaceBetween', 100),
+			'speed' => $params->get('speed', 400),
+			'spaceBetween' => $params->get('spaceBetween', 100),
 			'allowTouchMove' => $params->get('allowTouchMove', 1),
-			'autoHeight'     => $params->get('autoHeight', 0),
-			'direction'      => $params->get('direction', 'horizontal'),
+			'autoHeight' => $params->get('autoHeight', 0),
+			'direction' => $params->get('direction', 'horizontal'),
 			'allowSlideNext' => $params->get('allowSlideNext', 1),
 			'allowSlidePrev' => $params->get('allowSlidePrev', 1),
+			'loop' => $params->get('loop', 1),
 
 		];
 		/**
 		 * Navigation
 		 */
-		if ($params->get('show_swiper_navigation', 0) == 1)
-		{
-			$pagination                  = [
+		if ($params->get('show_swiper_navigation', 0) == 1) {
+			$pagination = [
 				'nextEl' => '.swiper-button-next_' . $module_id,
 				'prevEl' => '.swiper-button-prev_' . $module_id,
 			];
 			$swiper_params['navigation'] = $pagination;
-		}
-		else
-		{
+		} else {
 			$swiper_params['navigation'] = false;
 		}
 
@@ -323,32 +300,27 @@ class WtjshoppingswipercarouselHelper
 		 * Pagination
 		 */
 
-		if ($params->get('show_swiper_pagination', 0) == 1)
-		{
-			$pagination                       = [];
-			$pagination['el']                 = '.swiper-pagination_' . $module_id;
-			$pagination['dynamicBullets']     = $params->get('dynamicBullets', 1);
+		if ($params->get('show_swiper_pagination', 0) == 1) {
+			$pagination = [];
+			$pagination['el'] = '.swiper-pagination_' . $module_id;
+			$pagination['dynamicBullets'] = $params->get('dynamicBullets', 1);
 			$pagination['dynamicMainBullets'] = $params->get('dynamicMainBullets', 4);
-			$pagination['type']               = $params->get('pagination_type', 'bullets');
+			$pagination['type'] = $params->get('pagination_type', 'bullets');
 
 			$swiper_params['pagination'] = $pagination;
-		}
-		else
-		{
+		} else {
 			$swiper_params['pagination'] = false;
 		}
 		/**
 		 * Breakpoints
 		 */
-		if ($params->get('use_breakpoints', 0) == 1 && count((array) $params->get('breakpoints')) > 0)
-		{
+		if ($params->get('use_breakpoints', 0) == 1 && count((array) $params->get('breakpoints')) > 0) {
 			$breakpoints = [];
-			foreach ($params->get('breakpoints') as $breakpoint)
-			{
+			foreach ($params->get('breakpoints') as $breakpoint) {
 				$breakpoints[$breakpoint->breakpoint] = [
 					'slidesPerView' => $breakpoint->slidesPerView,
-					'spaceBetween'  => $breakpoint->spaceBetween,
-					'direction'     => (!empty($breakpoint->direction) ? $breakpoint->direction : 'horizontal'),
+					'spaceBetween' => $breakpoint->spaceBetween,
+					'direction' => (!empty($breakpoint->direction) ? $breakpoint->direction : 'horizontal'),
 				];
 			}
 
@@ -359,20 +331,16 @@ class WtjshoppingswipercarouselHelper
 		 * Scrollbar
 		 */
 
-		if ($params->get('show_swiper_scrollbar', 0) == 1)
-		{
-			$scrollbar              = [];
-			$scrollbar['el']        = '.swiper-scrollbar' . $module_id;
+		if ($params->get('show_swiper_scrollbar', 0) == 1) {
+			$scrollbar = [];
+			$scrollbar['el'] = '.swiper-scrollbar' . $module_id;
 			$scrollbar['draggable'] = $params->get('scrollbar_draggable', 0);
-			if (!empty($params->get('dragSize')))
-			{
+			if (!empty($params->get('dragSize'))) {
 				$scrollbar['dragSize'] = $params->get('dragSize');
 			}
 
 			$swiper_params['scrollbar'] = $scrollbar;
-		}
-		else
-		{
+		} else {
 			$swiper_params['scrollbar'] = false;
 		}
 
@@ -380,17 +348,14 @@ class WtjshoppingswipercarouselHelper
 		 * Autoplay
 		 */
 
-		if ($params->get('enable_autoplay', 0) == 1)
-		{
-			$autoplay                         = [];
+		if ($params->get('enable_autoplay', 0) == 1) {
+			$autoplay = [];
 			$autoplay['disableOnInteraction'] = $params->get('scrollbar_draggable', 0);
-			$autoplay['delay']                = $params->get('delay', 3000);
+			$autoplay['delay'] = $params->get('delay', 3000);
 
 
 			$swiper_params['autoplay'] = $autoplay;
-		}
-		else
-		{
+		} else {
 			$swiper_params['autoplay'] = false;
 		}
 

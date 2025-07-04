@@ -2,7 +2,7 @@
 
 /**
  * @package    WT JShopping Swiper carousel
- * @version       1.1.2
+ * @version       1.1.3
  * @Author        Sergey Tolkachyov, https://web-tolk.ru
  * @copyright     Copyright (C) 2023 Sergey Tolkachyov
  * @license       GNU/GPL http://www.gnu.org/licenses/gpl-3.0.html
